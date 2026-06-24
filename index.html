@@ -63,13 +63,11 @@ function colorExpr() {
   return ['interpolate',['linear'], v, ...stops];
 }
 
-const BR_FIT = [[-74.5, -34.5], [-33.5, 6.5]];   // Brazil extent — initial framing
-const BR_MAX = [[-82, -40], [-25, 11]];          // hard pan limit (a little looser)
+// Blank white canvas — no world base map, so ONLY Brazil (our municipal polygons) is drawn.
 const map = new maplibregl.Map({
   container:'map',
-  style:'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-  bounds: BR_FIT, fitBoundsOptions:{padding:10},
-  maxBounds: BR_MAX, minZoom:3.2, maxZoom:10, attributionControl:true
+  style:{version:8, sources:{}, layers:[{id:'bg', type:'background', paint:{'background-color':'#ffffff'}}]},
+  center:[-54,-14], zoom:3.7, attributionControl:false
 });
 map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
@@ -93,9 +91,9 @@ map.on('load', async () => {
 
   map.addSource('mun', {type:'geojson', data:'municipios.geojson', promoteId:'co_mun'});
   map.addLayer({id:'fill', type:'fill', source:'mun',
-    paint:{'fill-color':colorExpr(), 'fill-opacity':0.85}}, firstSymbolId());
+    paint:{'fill-color':colorExpr(), 'fill-opacity':0.95}});
   map.addLayer({id:'outline', type:'line', source:'mun',
-    paint:{'line-color':'#888','line-width':0.15,'line-opacity':0.4}}, firstSymbolId());
+    paint:{'line-color':'#9a9a9a', 'line-width':0.25, 'line-opacity':0.55}});
 
   sel.onchange = ()=>loadDest(sel.value);
   yr.oninput   = ()=>{ curYearIdx=+yr.value; render(); };
