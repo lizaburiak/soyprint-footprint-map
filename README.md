@@ -1,26 +1,32 @@
 # Brazilian soy land-use footprint — interactive map
 
-An interactive choropleth of the **land-use footprint of Brazilian soy** (hectares)
-embodied in international consumption, by municipality of origin, 2010–2022.
+An interactive map of the **land-use footprint of Brazilian soy** (hectares) embodied in
+international consumption, by **municipality of origin**, 2010–2022.
 
-- **Year slider + ▶ play** — watch the footprint expand over the decade.
-- **Destination dropdown** — Total · China · EU-27 · Rest of Asia · Rest of world.
+Live: **https://lizaburiak.github.io/soyprint-footprint-map/**
+
+- **Destination dropdown** — Total, the regional aggregates (EU-27, Rest of Asia, Rest of
+  world, Brazil-domestic), and **every individual importing country**.
+- **Year slider + ▶ play** — watch the footprint expand across the decade.
 - **Hover** a municipality for its footprint in hectares.
 
-Colour is a shared square-root scale across all years and destinations, so a darker
-municipality always means a larger footprint.
+Built with **MapLibre GL JS** (WebGL): the municipal geometry loads once; selecting a
+destination fetches only that destination's small values file and recolours on the GPU, so
+it stays fast with all ~190 destinations. Colour is a shared square-root scale.
 
-Built from the open, reproducible SOYPRINT pipeline (municipality → FABIO → consumer).
-`index.html` is self-contained (loads plotly.js from a CDN).
+From the open, reproducible SOYPRINT pipeline (municipality → FABIO → consumer).
 
-## Republish / update
+## Files
+- `index.html` — the MapLibre app.
+- `municipios.geojson` — simplified municipal boundaries (loaded once).
+- `data/index.json` — destination list + shared colour `vmax`.
+- `data/<KEY>.json` — per-municipality footprint by year for each destination (ISO3 for
+  countries; `total`, `r_eu27`, `r_asia`, `r_row`, `r_bra` for aggregates).
 
-Regenerate `index.html` from the pipeline outputs:
-
+## Regenerate / update
+In the SOYPRINT repo:
 ```bash
-# in the SOYPRINT repo:
-Rscript code/prep_map_allyears.R      # extract per-municipality footprint, all years
-.venv/bin/python code/build_web_map.py # -> web/footprint_map.html
-cp web/footprint_map.html /path/to/soyprint-footprint-map/index.html
-git -C /path/to/soyprint-footprint-map commit -am "update map" && git -C ... push
+Rscript code/prep_web_data.R         # per-destination JSON -> web/data/
+.venv/bin/python code/build_web_geometry.py   # -> web/municipios.geojson
+# then copy web/{index.html,municipios.geojson,data} here, commit, push
 ```
